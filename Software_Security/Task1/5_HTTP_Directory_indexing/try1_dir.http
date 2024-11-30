@@ -1,0 +1,10 @@
+GET http://challenge01.root-me.org/web-serveur/ch4/challenge01.root-me.org/web-serveur/ch4/admin
+
+###
+
+GET http://challenge01.root-me.org/web-serveur/ch4/admin/backup
+
+###
+
+GET http://challenge01.root-me.org/web-serveur/ch4/admin/backup/admin.txt
+

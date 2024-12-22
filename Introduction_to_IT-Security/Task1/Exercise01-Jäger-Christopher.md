@@ -25,48 +25,67 @@ Zur Behebung solcher Schwachstellen sollten Entwickler entsprechende Patches ber
 
 ## Aufgabe 3: Application Whitelisting mit WDAC
 
-### 1. Wie funktioniert Application Whitelisting mit WDAC und wie unterscheidet es sich von AppLocker?
+### Überarbeitete Antwort: Aufgabe 3 – Application Whitelisting mit WDAC
 
-**WDAC** basiert auf der Definition von Sicherheitsrichtlinien, die festlegen, welche Anwendungen und Skripte auf einem System ausgeführt werden dürfen. Es arbeitet tief auf Kernel-Ebene und verwendet kryptografische Signaturen oder Hash-Werte, um Anwendungen zu verifizieren. 
+#### 1. Wie funktioniert Application Whitelisting mit WDAC und wie unterscheidet es sich von AppLocker?
 
-**AppLocker**, ein anderes Tool für Application Whitelisting, bietet ebenfalls Richtlinien zur Steuerung von Softwareausführung, ist jedoch benutzerfreundlicher und weniger tiefgreifend. Der Hauptunterschied liegt in der Zielgruppe und Funktionsweise:
-- **WDAC**: Für hochsichere Umgebungen, mit granularen Richtlinien und tiefgreifender Kontrolle.
-- **AppLocker**: Geeignet für kleinere Unternehmen oder weniger komplexe Umgebungen, einfacher zu konfigurieren und zu verwalten.
+**Windows Defender Application Control (WDAC)** ermöglicht die Erstellung von Sicherheitsrichtlinien, die festlegen, welche Anwendungen und Skripte auf einem System ausgeführt werden dürfen. WDAC arbeitet auf Kernel-Ebene und verwendet kryptografische Signaturen oder Hash-Werte, um die Integrität von Anwendungen zu überprüfen.  
 
-### 2. Wie schränkt WDAC Benutzer/Prozesse bei der Codeausführung ein?
+**AppLocker** hingegen ist ein weniger komplexes Whitelisting-Tool, das auf Gruppenrichtlinien basiert. Es bietet ebenfalls Richtlinien für die Steuerung der Softwareausführung, ist jedoch einfacher zu konfigurieren und wird häufig in weniger sicherheitskritischen Umgebungen eingesetzt.
 
-WDAC erlaubt die Ausführung von Code nur, wenn dieser mit einer genehmigten Signatur oder einem Hash-Wert übereinstimmt. Nicht genehmigte Software wird blockiert, auch wenn sie von Administratoren ausgeführt wird. Dies schützt Systeme effektiv vor Zero-Day-Exploits und nicht autorisierten Anwendungen.
+**Hauptunterschiede:**
+- **WDAC**: Für Umgebungen mit hohen Sicherheitsanforderungen, arbeitet auf Kernel-Ebene, tiefergehende Kontrolle, granularere Richtlinien.  
+- **AppLocker**: Für kleinere Unternehmen oder weniger komplexe Szenarien, einfacher zu implementieren, aber weniger tiefgreifend.  
 
-### 3. Wie schränkt WDAC Benutzer/Prozesse beim Lesen von Dateien ein?
+#### 2. Wie schränkt WDAC Benutzer/Prozesse bei der Codeausführung ein?
 
-WDAC konzentriert sich primär auf die Kontrolle der Codeausführung und bietet keine direkte Steuerung des Lesens von Dateien. Indirekt schützt es jedoch vor dem Lesen und Ausführen schädlicher Skripte, indem es nur vertrauenswürdigen Anwendungen den Zugriff auf Systemressourcen erlaubt.
+WDAC erzwingt strenge Richtlinien, die nur signierten oder explizit genehmigten Anwendungen und Skripten die Ausführung erlauben. Die Verifikation erfolgt über:
+- **Signaturen**: Überprüfung der digitalen Signatur.
+- **Hash-Werte**: Abgleich mit vordefinierten Hashes in der Richtlinie.
 
-### 4. Wie schränkt WDAC Benutzer/Prozesse beim Schreiben von Dateien ein?
+Selbst Administratoren können keine nicht genehmigten Anwendungen ausführen, was Systeme effektiv vor unautorisiertem Code schützt, einschließlich Zero-Day-Exploits und Malware.
 
-WDAC beschränkt das Schreiben von Dateien nicht direkt, sondern verhindert, dass nicht autorisierte Anwendungen Code schreiben oder installieren. Dies reduziert das Risiko, dass Malware bösartigen Code ins System injiziert.
+#### 3. Wie schränkt WDAC Benutzer/Prozesse beim Lesen von Dateien ein?
 
-### 5. Welche Dateiregeln können Sie mit WDAC verwenden?  
+**WDAC steuert keine direkten Datei-Lesezugriffe.**  
+Es kontrolliert ausschließlich, welche Anwendungen ausgeführt werden dürfen. Dadurch wird indirekt verhindert, dass nicht autorisierte Programme schädliche Dateien oder Daten lesen und verarbeiten können.
 
-1. **Hash**: Sehr spezifisch, basiert auf den Hash-Werten der Binärdateien. Erfordert häufige Updates bei Versionänderungen.  
-2. **FileName**: Nutzt Dateinamen (*z. B. OriginalFileName*). Weniger sicher, aber minimiert Richtlinienaktualisierungen.  
-3. **FilePath**: Erlaubt Binärdateien aus bestimmten Dateipfaden (nur Benutzer-Modus).  
-4. **SignedVersion**: Erlaubt Binärdateien von bestimmten Herausgebern mit Mindestversionsnummern.  
-5. **Publisher**: Vertrauenswürdig für Dateien eines spezifischen Herausgebers (z. B. Intel).  
-6. **FilePublisher**: Kombiniert Dateinamen, Herausgeber und Mindestversion für spezifische signierte Dateien.  
-7. **LeafCertificate**: Vertrauenswürdig für spezifische Signaturzertifikate; Updates nur bei Ablauf erforderlich.  
-8. **PcaCertificate**: Vertrauenswürdigkeit für Zertifikate eine Stufe unterhalb des Root-Zertifikats.  
-9. **WHQL**: Unterstützt von Microsoft zertifizierte Treiber (WHQL).  
-10. **WHQLPublisher**/**WHQLFilePublisher**: Kombiniert WHQL mit Herausgeber- oder Dateinamenregeln, hauptsächlich für Kernel-Treiber.
+#### 4. Wie schränkt WDAC Benutzer/Prozesse beim Schreiben von Dateien ein?
 
-- https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/design/select-types-of-rules-to-create
+**WDAC regelt keine direkten Datei-Schreibzugriffe.**  
+Die Richtlinien verhindern jedoch, dass nicht autorisierte Anwendungen gestartet werden. Dadurch wird das Risiko reduziert, dass Malware bösartigen Code ins System schreibt oder persistente Bedrohungen erstellt.
 
-### 6. Was ist der Zweck des Audit-Modus in WDAC?
+#### 5. Welche Dateiregeln können Sie mit WDAC verwenden?
 
-Der Audit-Modus dient zur Testung von WDAC-Richtlinien, ohne die Ausführung von Anwendungen tatsächlich zu blockieren. Administratoren können damit potenzielle Probleme oder Konflikte identifizieren und sicherstellen, dass die Richtlinien wie gewünscht funktionieren, bevor sie durchgesetzt werden.
+1. **Hash**: Regeln basieren auf den spezifischen Hash-Werten von Binärdateien. Änderungen an der Datei erfordern ein Update der Richtlinie.  
+2. **FileName**: Basierend auf dem Namen der Datei (z. B. `OriginalFileName`). Weniger sicher, aber einfacher zu verwalten.  
+3. **FilePath**: Erlaubt die Ausführung von Binärdateien aus definierten Verzeichnissen (gilt nur im Benutzer-Modus).  
+4. **SignedVersion**: Erlaubt signierte Anwendungen eines Herausgebers mit einer Mindestversionsnummer.  
+5. **Publisher**: Vertrauenswürdigkeit basierend auf dem Herausgeber der Anwendung.  
+6. **FilePublisher**: Kombiniert Herausgeberinformationen, Dateinamen und Mindestversion.  
+7. **LeafCertificate**: Basierend auf einem spezifischen Signaturzertifikat.  
+8. **PcaCertificate**: Vertrauenswürdigkeit für Zertifikate eine Ebene unterhalb des Root-Zertifikats.  
+9. **WHQL**: Unterstützt von Microsoft zertifizierte Treiber (Windows Hardware Quality Labs).  
+10. **WHQLPublisher/WHQLFilePublisher**: Kombination aus WHQL-Zertifizierung und Herausgeberregeln, insbesondere für Kernel-Treiber.  
 
-### 7. Wie debuggen Sie WDAC-Richtlinien? Welche Logging-Ressourcen können genutzt werden?
+#### 6. Was ist der Zweck des Audit-Modus in WDAC?
 
-- **Ereignisanzeige (Event Viewer)**: Speichert alle Aktivitäten und Blockierungen im Protokoll „Microsoft-Windows-CodeIntegrity/Operational“.
-- **PowerShell**: Cmdlets wie `Get-WinEvent` helfen bei der Abfrage spezifischer Ereignisse.
-- **Microsoft Defender Advanced Threat Protection**: Bietet detaillierte Einblicke in Richtlinienwirkungen.
-- **Spezifische Tools**: Anwendungen wie `PolicyAnalyzer` analysieren WDAC-Richtlinien und erkennen mögliche Lücken oder Fehler.
+Der **Audit-Modus** ermöglicht die Evaluierung von WDAC-Richtlinien, ohne die Ausführung von Anwendungen tatsächlich zu blockieren. Dabei werden alle Verstöße protokolliert, sodass Administratoren die Richtlinien anpassen können, bevor sie in den Erzwingungsmodus wechseln. Dies minimiert Betriebsunterbrechungen und erleichtert die Einführung neuer Richtlinien.
+
+#### 7. Wie debuggen Sie WDAC-Richtlinien? Welche Logging-Ressourcen können genutzt werden?
+
+1. **Ereignisanzeige (Event Viewer):**  
+   - Protokoll: `Microsoft-Windows-CodeIntegrity/Operational`.  
+   - Enthält detaillierte Informationen zu blockierten Anwendungen und deren Gründen.  
+
+2. **PowerShell:**  
+   - Cmdlets wie `Get-WinEvent` zur Analyse spezifischer WDAC-Ereignisse.  
+
+3. **Microsoft Defender Advanced Threat Protection (ATP):**  
+   - Detaillierte Berichte über blockierte Anwendungen und potenzielle Richtlinienkonflikte.  
+
+4. **PolicyAnalyzer:**  
+   - Ein Microsoft-Tool zur Analyse und Optimierung von WDAC-Richtlinien.  
+
+5. **Weitere Ressourcen:**  
+   - Debugging-Logs mit Hilfe von `ConvertFrom-CIPolicy` und `Merge-CIPolicy`, um Richtlinienänderungen zu überprüfen.  
